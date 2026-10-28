@@ -16,8 +16,6 @@ identification, the Android app, firmware update metadata, and video settings.
 
 | Path | Contents |
 | --- | --- |
-| [`LD29.txt`](./LD29.txt) | LD29 device details, firmware metadata, and related service URLs. |
-| [`LD39.txt`](./LD39.txt) | LD39 USB descriptors, app/device versions, system logs, and related service URLs. |
 | [`app/`](./app/) | Archived Android and iOS app packages; see the [app notes](./app/README.md). |
 | [`firmwares/`](./firmwares/) | Firmware packages grouped by product or model. |
 | [`screenshots/`](./screenshots/) | Screenshots captured during the research. |
