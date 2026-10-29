@@ -1,4 +1,60 @@
-# Firmware utilities and rootfs research
+# Firmware, rootfs, and Sage USB research utilities
+
+## Sage Mirroring Suit USB video tools
+
+[`sage_usb_video_sender_v3.py`](./sage_usb_video_sender_v3.py) is the
+recommended sender when the goal is to display a video on the Sage receiver.
+It is the current implementation that has successfully made videos appear on
+screen. Unlike the packetizer-only scripts below, it prepares the video,
+handles the USB start request and heartbeat, and sends the H.264 stream.
+
+### Requirements
+
+- Python 3 and PyUSB (`python3 -m pip install pyusb`)
+- A working `libusb-1.0` backend and permission to access the USB device
+- `ffmpeg` to convert regular video files to H.264 Annex-B
+- `ffplay` and a working Linux audio output for local audio playback (optional)
+
+Connect the receiver and list the available USB devices:
+
+```sh
+python3 utils/sage_usb_video_sender_v3.py --list
+```
+
+Send a video file (MP4, MKV, and other formats supported by `ffmpeg`):
+
+```sh
+python3 utils/sage_usb_video_sender_v3.py path/to/video.mp4
+```
+
+The sender converts the video to H.264 Annex-B, waits up to 10 seconds for a
+STAR start request, and then transmits the video. By default, it requests
+1024x576 at 60 fps and 10 Mbit/s. If the source has audio, `ffplay` plays that
+audio locally; audio is not sent over USB, and playback is not guaranteed to be
+synchronized with the displayed video. Use `--no-audio` to disable local
+playback.
+
+To check conversion and packet preparation without opening or writing to a USB
+device, use `--dry-run`:
+
+```sh
+python3 utils/sage_usb_video_sender_v3.py path/to/video.mp4 --dry-run
+```
+
+For a prepared raw H.264 Annex-B file, use `--send-raw-h264`. The input must
+contain AUD NAL units so the sender can split it into access units; this option
+does not play audio. If the receiver is already in a mirroring session,
+`--wait-start 0` skips waiting for a new STAR request. Use `--help` for options
+such as resolution, frame rate, bitrate, interface, and device IDs.
+
+Other Sage utilities in this directory:
+
+| Script | Purpose |
+| --- | --- |
+| [`sage_usb_video_sender.py`](./sage_usb_video_sender.py) and [`sage_usb_video_sender_v2.py`](./sage_usb_video_sender_v2.py) | Earlier experimental USB video sender implementations; use v3 for the current video-display workflow. |
+| [`sage_usb_analyzer.py`](./sage_usb_analyzer.py) | Reconstructs and summarizes Sage bulk USB messages from a Linux usbmon PCAPNG capture. Uses only the Python standard library. |
+| [`sage_h264_packetizer.py`](./sage_h264_packetizer.py) | Builds candidate messages from Annex-B H.264 using a captured message as a template. It does not negotiate a session or send USB data. |
+| [`sage_v2_packetizer.py`](./sage_v2_packetizer.py) | Writes candidate protocol-v2 messages, one per access unit. It does not perform USB transmission or start negotiation. |
 
 ## ActionsFirmware rootfs extractor
 
